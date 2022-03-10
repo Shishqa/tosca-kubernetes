@@ -1,0 +1,35 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: tosca-kubernetes
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+  michman.nodes.Etcd:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      name:
+        type: string
+        required: true
+        description: etcd controller name
+    capabilities:
+      access_endpoint:
+        type: tosca.capabilities.Endpoint
+      internal_endpoint:
+        type: tosca.capabilities.Endpoint.Etcd
+    requirements:
+      - member:
+          # FIXME: too many connections n*(n-1)/2
+          capability: tosca.capabilities.Endpoint.Etcd
+          node: michman.nodes.Etcd
+          occurences: [ 0, UNBOUNDED ]
+
+capability_types:
+
+  michman.capabilities.Endpoint.Etcd:
+    derived_from: tosca.capabilities.Endpoint

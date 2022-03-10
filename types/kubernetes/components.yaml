@@ -1,0 +1,86 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: tosca-kubernetes
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+################################################################################
+
+  michman.nodes.Kubernetes:
+    derived_from: tosca.nodes.Root
+    capabilities:
+      host:
+        type: tosca.capabilities.Container
+        valid_source_types: [ michman.nodes.Kubernetes.Resource ]
+
+################################################################################
+
+  michman.nodes.Kubernetes.Master:
+    derived_from: tosca.nodes.SoftwareComponent
+    capabilities:
+      kube_apiserver:
+        type: tosca.capabilities.Endpoint
+      host:
+        type: tosca.capabilities.Container
+        valid_source_types: [ michman.nodes.Kubernetes.Resource ]
+    requirements:
+      - etcd:
+          capability: michman.capabilities.Endpoint.Etcd
+          occurences: [ 1, UNBOUNDED ]
+
+  michman.nodes.Kubernetes.Worker:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - master:
+          capability: tosca.capabilities.Endpoint
+
+################################################################################
+
+  michman.nodes.Kubernetes.APIServer:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+    capabilities:
+      kube_apiserver:
+        type: tosca.capabilities.Endpoint
+    requirements:
+      - etcd:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Etcd
+
+  michman.nodes.Kubernetes.ControllerManager:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+    capabilities:
+    requirements:
+      - kube_apiserver
+
+  michman.nodes.Kubernetes.Scheduler:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+    capabilities:
+    requirements:
+      - kube_apiserver
+
+  michman.nodes.Kubernetes.Kubelet:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - container_engine:
+          capability: michman.capabilities.CRI
+      - network_plugin:
+      - kubeconfig:
+
+  michman.nodes.Kubernetes.KubeProxy:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - kubeconfig:
+
+  michman.nodes.Kubernetes.Kubectl:
+    derived_from: tosca.nodes.SoftwareComponent
+
+

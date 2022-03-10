@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: tosca-kubernetes
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+  michman.nodes.Container.Runtime.Crio:
+    derived_from: tosca.nodes.Container.Runtime
+    capabilities:
+      cri_runtime:
+        type: michman.capabilities.CRI
+
+
+capability_types:
+
+  michman.capabilities.CRI:
+    derived_from: 
