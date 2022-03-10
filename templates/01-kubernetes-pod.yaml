@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  substitution_mappings:
+    node_type: tosca.nodes.Container.Runtime
+    properties:
+      component_version: # XXX
+    capabilities:
+      host: [ kubernetes_container, host ]
+      scalable: [ kubernetes_pod, scalable ]
+
+  node_templates:
+
+    kubernetes_container:
+      type: michman.nodes.Container.Runtime # XXX -> Kubernetes
+      requirements:
+        - pod: kubernetes_pod
+
+    kubernetes_pod:
+      type: michman.nodes.Kubernetes.Resources.Pod
+      requirements:
+        - container: kubernetes_container

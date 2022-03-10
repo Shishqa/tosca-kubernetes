@@ -1,0 +1,23 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  node_templates:
+
+    # TODO: example types
+
+    mysql:
+      type: tosca.nodes.SoftwareComponent
+      requirements:
+        - host: mysql_server
+
+    mysql_server:
+      type: tosca.nodes.Compute
+
+
+    wordpress:
+      type: tosca.nodes.Container.Application
+
+    wordpress_container:
+      type: tosca.nodes.Container.Runtime

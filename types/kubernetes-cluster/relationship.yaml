@@ -1,0 +1,20 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: kubernetes-cluster-data-types
+  template_author: shishqa
+  template_version: 1.3.0
+
+description: >-
+  # TODO
+
+relationship_types:
+
+  michman.relationships.Kubernetes.ConnectsWithKubeconfigTo:
+    derived_from: tosca.relationships.Root
+    valid_target_types: [ michman.capabilities.TODO ]
+    properties:
+      kubeconfig:
+        type: michman.datatypes.Kubernetes.Kubeconfig
+        description: >-
+          # TODO

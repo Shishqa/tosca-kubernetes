@@ -1,0 +1,72 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: container-runtimes
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+  michman.nodes.CRI-O:
+    derived_from: tosca.nodes.SoftwareComponent
+
+
+
+  michman.nodes.OCI.Container.Runtime:
+    derived_from: tosca.nodes.Container.Runtime
+    capabilities:
+      cri:
+        type: michman.capabilities.Container.CRI
+    requirements:
+      - image:
+          capability: michman.capabilities.OCI.Container.Image
+
+      - host:
+          capability: michman.capabilities.OCI.Runtime
+
+
+  michman.nodes.OCI.Container.Image:
+    derived_from: tosca.nodes.Root
+    capabilities:
+      image:
+        type: michman.capabilities.OCI.Container.Image
+
+
+
+
+  michman.nodes.CRI.Container.Manager:
+    derived_from: tosca.nodes.SoftwareComponent
+
+
+  michman.nodes.Container.Runtime.OCI:
+    derived_from: tosca.nodes.Container.Runtime
+    capabilities:
+      oci:
+        type: michman.capabilities.Container.OCI
+
+  michman.nodes.Container.Runtime.runc:
+    derived_from: michman.nodes.SoftwareComponent
+
+  michman.nodes.Container.Runtime.kata:
+    derived_from: michman.nodes.SoftwareComponent
+
+  michman.nodes.Container.Runtime.CRI-O:
+    derived_from: michman.nodes.SoftwareComponent
+    requirements:
+      - oci_runtime:
+          capability: michman.capabilities.OCI.Runtime
+
+capability_types:
+
+  michman.capabilities.OCI.Runtime:
+    derived_from: tosca.capabilities.Root
+
+  michman.capabilities.OCI.Container.Image:
+    derived_from: tosca.capabilities.Root
+
+  michman.capabilities.CRI:
+    derived_from: tosca.capabilities.Endpoint
+

@@ -1,0 +1,68 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: tosca-kubernetes
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+  michman.nodes.Kubernetes.Resource:
+    derived_from: tosca.nodes.Root
+    properties:
+      apiVersion:
+        type: string
+        default: v1
+        constraints:
+          - valid_values: [v1, v1alpha1, v2alpha1, v1beta1, v1beta2, v2beta1, v2beta2]
+        required: true
+      apiGroup:
+        description: Along with the version is exposed in the "apiVersion" field as "GROUP/VERSION", e.g. "policy.k8s.io/v1".
+        type: string
+        default: ''
+        required: true
+        constraints:
+          - valid_values: ['', core, apps, batch]
+    requirements:
+      - host:
+          capability: tosca.capabilities.Container
+          node: michman.nodes.Kubernetes
+          relationship: tosca.relationships.HostedOn
+
+  michman.nodes.Kubernetes.Resource.Container:
+    derived_from: michman.nodes.Root
+    capabilities:
+      host:
+        type: tosca.capabilities.Compute
+      container:
+        type: michman.capabilities.Kubernetes.Resource.Container
+
+
+  michman.nodes.Kubernetes.Resource.Pod:
+    derived_from: michman.nodes.Kubernetes.Resource
+    requirements:
+      - container:
+          capability: michman.capabilities.Kubernetes.Resource.Container
+
+
+    capabilities:
+      pod:
+        type: tosca.capabilities.Container
+        valid_source_types: [ tosca.nodes.Container.Application ]
+
+capability_types:
+
+  michman.capabilities.Kubernetes.Resource.Container:
+    derived_from: michman.capabilities.Root
+    properties:
+      image:
+        type: string
+
+  michman.capabilities.Kubernetes.Resource.Container:
+    derived_from: michman.capabilities.Root
+    properties:
+      image:
+        type: string

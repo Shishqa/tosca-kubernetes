@@ -1,0 +1,140 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+  template_name: kubernetes-cluster-node-types
+  template_author: shishqa
+  template_version: 1.0.0
+
+description: >-
+  TODO
+
+node_types:
+
+################################################################################
+
+  michman.nodes.Kubernetes.Cluster:
+    derived_from: tosca.nodes.Compute
+
+
+
+  tosca.nodes.Kubernetes:
+    derived_from: tosca.nodes.Root
+    properties:
+      version:
+        required: true
+        type: string
+    capabilities:
+      kube_apiserver:
+        type: tosca.capabilities.Endpoint
+      host:
+        type: tosca.capabilities.Container
+        valid_source_types: [ michman.nodes.Kubernetes.Resource ]
+
+################################################################################
+
+  michman.nodes.Kubernetes.ControlPlane:
+    derived_from: tosca.nodes.Root
+    capabilities:
+      apiserver_endpoint:
+        type: tosca.capabilities.Endpoint
+      host:
+        type: tosca.capabilities.Container
+        valid_source_types: [ michman.nodes.Kubernetes.Resource ]
+    requirements:
+      - etcd:
+          capability: michman.capabilities.Etcd
+          node: michman.nodes.Etcd
+          relationship: tosca.relationships.ConnectsTo
+          occurences: [ 1, UNBOUNDED ]
+
+  michman.nodes.Kubernetes.Worker:
+    derived_from: tosca.nodes.Root
+    requirements:
+      - master:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Kubernetes.Master
+          relationship: michman.relationships.Kubernetes.JoinsTo
+
+################################################################################
+
+  michman.nodes.Kubernetes.APIServer:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+    capabilities:
+      apiserver:
+        type: tosca.capabilities.Endpoint
+    requirements:
+      - etcd:
+          capability: michman.capabilities.Etcd
+          node: michman.nodes.Etcd
+          relationship: tosca.relationships.ConnectsTo
+          occurences: [ 1, UNBOUNDED ]
+
+  michman.nodes.Kubernetes.ControllerManager:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+      cluster_name:
+        type: string
+      cluster_cidr:
+        type: # XXX
+    capabilities:
+      endpoint:
+        type: tosca.capabilities.Endpoint
+    requirements:
+      - apiserver:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Kubernetes.APIServer
+          relationship: michman.relationships.Kubernetes.ConnectsWithKubeconfigTo
+
+  michman.nodes.Kubernetes.Scheduler:
+    derived_from: tosca.nodes.Container.Application
+    properties:
+    capabilities:
+    requirements:
+      - apiserver:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Kubernetes.APIServer
+          relationship: # TODO
+
+  michman.nodes.Kubernetes.Kubelet:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - container_runtime:
+          capability: michman.capabilities.Container.CRI
+      - container_network:
+      - apiserver:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Kubernetes.APIServer
+          relationship: # TODO
+
+  michman.nodes.Kubernetes.KubeProxy:
+    derived_from: tosca.nodes.SoftwareComponent
+    requirements:
+      - apiserver:
+          capability: tosca.capabilities.Endpoint
+          node: michman.nodes.Kubernetes.APIServer
+          relationship: # TODO
+
+
+
+
+
+
+  michman.nodes.Kubernetes.Kubectl:
+    derived_from: tosca.nodes.SoftwareComponent
+
+
+  michman.nodes.Kubernetes.Resource:
+    derived_from: tosca.nodes.Root
+    requirements:
+      - host:
+          capability: tosca.capabilities.Container
+          node: michman.nodes.Kubernetes
+          relationship: tosca.relationships.HostedOn
+
+  michman.nodes.Kubernetes.Resource.Pod:
+    derived_from: michman.nodes.Kubernetes.Resource
+    capabilities:
+      pod:
+        type: tosca.capabilities.Container
+        valid_source_types: [ tosca.nodes.Container.Application ]

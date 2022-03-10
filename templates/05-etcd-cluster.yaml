@@ -6,16 +6,15 @@ topology_template:
   substitution_mappings:
     node_type: tosca.nodes.Etcd
     capabilities:
-      database_endpoint: [ database, database_endpoint ]
+      etcd: [ etcd, access_endpoint ]
+      scalable: [ compute, scalable ]
 
   node_templates:
 
-    compute_storage_1:
-      type: tosca.nodes.Compute
-
-    etcd_1:
-      type: michman.nodes.Etcd.Worker
+    etcd:
+      type: michman.nodes.Etcd.Peer
       requirements:
-        - host: compute_storage_1
+        - host: compute
 
-
+    compute:
+      type: tosca.nodes.Compute

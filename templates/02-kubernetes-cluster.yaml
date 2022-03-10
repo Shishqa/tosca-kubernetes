@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+topology_template:
+  description: Template of a database including its hosting stack.
+
+  substitution_mappings:
+    node_type: michman.nodes.Kubernetes.Cluster
+    capabilities:
+      host: [ master, host ]
+
+  node_templates:
+
+    control_plane:
+      type: michman.nodes.Kubernetes.ControlPlane
+
+    worker:
+      type: michman.nodes.Kubernetes.Worker
+      capabilities:
+        scalable:
+          min_instances: 1
+          max_instances: 5
+          default_instances: 3
+      requirements:
+        - control_plane: control_plane
